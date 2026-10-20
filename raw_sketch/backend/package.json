@@ -1,0 +1,25 @@
+{
+  "name": "lcflight-backend",
+  "version": "2.0.0",
+  "description": "LCFLIGHT - ESP32 device dashboard backend (Express + MQTT + SSE + SQLite)",
+  "main": "src/server.js",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test test/"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.7.0",
+    "express": "^5.2.1",
+    "mqtt": "^5.10.4",
+    "multer": "^2.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.1"
+  },
+  "allowScripts": {
+    "better-sqlite3@11.10.0": true
+  }
+}

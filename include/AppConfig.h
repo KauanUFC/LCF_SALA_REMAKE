@@ -13,7 +13,6 @@ static constexpr uint32_t WIFI_RECONNECT_INTERVAL_MS = 10000;
 
 // MQTT (HiveMQ public broker)
 static constexpr const char* MQTT_BROKER = "broker.hivemq.com";
-// static constexpr const char* MQTT_BROKER = "<ip>"; // broker local Mosquitto
 static constexpr uint16_t MQTT_PORT = 1883;
 static constexpr uint32_t MQTT_RECONNECT_INTERVAL_MS = 5000;
 

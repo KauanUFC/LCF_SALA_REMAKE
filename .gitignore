@@ -7,5 +7,11 @@ include/Secrets.h
 .vscode/
 node_modules/
 package-lock.json
-raw_sketch/node_modules/
-raw_sketch/package-lock.json
+raw_sketch/backend/node_modules/
+raw_sketch/backend/package-lock.json
+raw_sketch/backend/data/
+raw_sketch/backend/.env
+raw_sketch/frontend/node_modules/
+raw_sketch/frontend/package-lock.json
+raw_sketch/frontend/dist/
+*.tsbuildinfo

@@ -1,7 +1,10 @@
 node_modules/
 .git
 .gitignore
-package-lock.json
+*.log
+backend/.env
+backend/data/
+frontend/dist
 Dockerfile
 docker-compose.yml
 .dockerignore
