@@ -27,7 +27,37 @@ frontend/
     styles/theme.css
 ```
 
-## Uso em desenvolvimento
+## Início rápido (recomendado)
+
+Na pasta `raw_sketch/`, rode o script que builda o frontend e inicia o backend:
+
+```bash
+cd raw_sketch
+./run.sh
+```
+
+Depois abra no navegador: **http://localhost:3000**
+
+O script:
+1. cria `backend/.env` a partir de `.env.example` (se não existir),
+2. instala dependências faltantes,
+3. faz o build do frontend (`frontend/dist`),
+4. inicia o backend, que serve a UI, a API e o SSE na mesma porta.
+
+Para parar: `Ctrl+C`.
+
+## Modo desenvolvimento (hot reload)
+
+```bash
+cd raw_sketch
+./dev.sh
+```
+
+- Backend/API: `http://localhost:3000`
+- Frontend (Vite): **http://localhost:5173** ← abra esta URL
+- O dev server faz proxy de `/api` e `/events` para o backend.
+
+## Uso em desenvolvimento (manual)
 
 ```bash
 # 1) Backend (porta 3000)
@@ -42,6 +72,16 @@ npm install
 npm run dev
 ```
 
+## Uso em produção (single server, sem Docker)
+
+```bash
+cd frontend && npm run build      # gera frontend/dist
+cd ../backend && npm start        # serve dist/ + API + SSE em :3000
+# Acesse http://localhost:3000
+```
+
+> O frontend **precisa** ser buildado antes do `npm start` — o backend serve `../frontend/dist`.
+
 ## Uso em produção (Docker)
 
 ```bash
@@ -49,6 +89,21 @@ cp backend/.env.example backend/.env   # configure broker, portas, credenciais
 docker compose up -d --build
 # Aplicação em http://localhost:3000, broker Mosquitto em :1883
 ```
+
+## Verificações rápidas
+
+```bash
+curl http://localhost:3000/api/info       # backend está no ar?
+curl http://localhost:3000/api/config     # broker MQTT conectado?
+```
+
+## Parar / reiniciar
+
+```bash
+# se iniciado em foreground (run.sh / npm start): Ctrl+C
+pkill -f "src/server.js"                  # encerra qualquer instância
+```
+
 
 ## Variáveis de ambiente (backend/.env)
 

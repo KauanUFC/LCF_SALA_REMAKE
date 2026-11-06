@@ -11,7 +11,7 @@ interface Props {
 
 export default function OtaSection({ hook }: Props) {
   const devices = hook.devices.filter((d) => d.status === 'connected' && d.ip)
-  const [deviceId, setDeviceId] = useState('')
+  const [deviceId, setDeviceId] = useState<number | ''>('')
   const [file, setFile] = useState<File | null>(null)
   const [progress, setProgress] = useState(0)
   const [uploading, setUploading] = useState(false)
@@ -30,7 +30,7 @@ export default function OtaSection({ hook }: Props) {
   }
 
   const upload = async () => {
-    if (!deviceId || !file) return
+    if (deviceId === '' || !file) return
     setUploading(true)
     setStatus({ type: 'info', text: 'Uploading...' })
     try {
@@ -57,7 +57,7 @@ export default function OtaSection({ hook }: Props) {
         <div className="card-body">
           <div className="form-group">
             <label className="form-label">Target Device</label>
-            <select className="form-select" value={deviceId} onChange={(e) => setDeviceId(e.target.value)}>
+            <select className="form-select" value={String(deviceId)} onChange={(e) => setDeviceId(Number(e.target.value) || '')}>
               <option value="">— Select a device —</option>
               {devices.map((d) => (
                 <option key={d.id} value={d.id}>{d.name} ({d.ip})</option>
@@ -76,17 +76,12 @@ export default function OtaSection({ hook }: Props) {
             <p className="muted small">or</p>
             <label className="file-label">
               Choose .bin file
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".bin"
-                onChange={(e) => handleFile(e.target.files?.[0])}
-              />
+              <input ref={fileInputRef} type="file" accept=".bin" onChange={(e) => handleFile(e.target.files?.[0])} />
             </label>
             {file && <div>{file.name} ({fmtBytes(file.size)})</div>}
           </div>
 
-          <button className="btn btn-success block" onClick={upload} disabled={uploading || !file || !deviceId}>
+          <button className="btn btn-success block" onClick={upload} disabled={uploading || !file || deviceId === ''}>
             {uploading ? 'Uploading...' : 'Upload Firmware'}
           </button>
 

@@ -1,16 +1,17 @@
 'use strict';
 
 const { env } = require('../config/env');
-const { eventBus } = require('../lib/event-bus');
 const { logger } = require('../lib/logger');
 const deviceRepo = require('../db/device-repo');
+const roomRepo = require('../db/room-repo');
+const deviceConfigRepo = require('../db/device-config-repo');
 
 const DEFAULT_COMMANDS = [{ id: 'led', label: 'LED', type: 'binary', actions: ['on', 'off'] }];
 
 function isValidIp(ip) {
   return (
     typeof ip === 'string' &&
-    /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(ip)
+    /^(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)$/.test(ip)
   );
 }
 
@@ -27,37 +28,47 @@ class DeviceService {
     this.discoveryActive = false;
   }
 
-  list() {
-    return deviceRepo.findAll();
+  list(roomId) {
+    return deviceRepo.findAll(roomId);
   }
 
   get(id) {
     return deviceRepo.findById(id);
   }
 
-  add({ name, description, ip }) {
-    if (!isValidIp(ip) && !String(ip || '').includes('.local')) {
+  add({ name, ip, roomId, deviceType, mac }) {
+    if (!isValidIp(ip) && !(ip || '').includes('.local')) {
       const err = new Error('Invalid IP address');
       err.statusCode = 400;
       throw err;
     }
-    const device = deviceRepo.create({ name, description, ip, commands: DEFAULT_COMMANDS });
+    const device = deviceRepo.create({
+      name,
+      ip,
+      roomId: roomId || null,
+      deviceType: deviceType || 'relay',
+      mac,
+      commands: JSON.parse(JSON.stringify(DEFAULT_COMMANDS)),
+    });
+    deviceConfigRepo.ensureForDevice(device);
     this.broadcastStatus(device);
     this._probeOne(device.id);
     return device;
   }
 
-  retry(id) {
+  async retry(id) {
     const device = deviceRepo.findById(id);
     if (!device) return null;
-    this._probeOne(id);
+    deviceRepo.updateFields(id, { status: 'connecting', error: null });
+    this.broadcastStatus(deviceRepo.findById(id));
+    await this._probeOne(id);
     return deviceRepo.findById(id);
   }
 
-  updateMode(id, mode) {
+  update(id, fields) {
     const device = deviceRepo.findById(id);
     if (!device) return null;
-    const updated = deviceRepo.updateCommandMode(id, mode);
+    const updated = deviceRepo.updateFields(id, fields);
     this.broadcastStatus(updated);
     return updated;
   }
@@ -65,7 +76,7 @@ class DeviceService {
   remove(id) {
     if (!deviceRepo.findById(id)) return null;
     deviceRepo.remove(id);
-    this.sse.broadcast({ type: 'remove', deviceId: id });
+    this.sse.broadcast({ type: 'remove', deviceId: String(id) });
     return true;
   }
 
@@ -95,7 +106,7 @@ class DeviceService {
         error: null,
         mac: info.mac || null,
         deviceId: info.device_id || null,
-        commands: commands || DEFAULT_COMMANDS,
+        commands: commands || JSON.parse(JSON.stringify(DEFAULT_COMMANDS)),
       });
       this.broadcastStatus(updated);
       logger.info(`Device connected: ${updated.name} @ ${updated.ip} (${updated.mac || 'n/a'})`);
@@ -125,14 +136,31 @@ class DeviceService {
     });
   }
 
-  handleTelemetry(mac, payload) {
+  handleTelemetry(mac, payload, retained = false) {
     const device = deviceRepo.findByMac(mac);
 
     if (device) {
-      deviceRepo.touchTelemetry(device.id, payload);
+      // Retained messages (delivered on subscribe) are stale — store the data
+      // for display but don't reset last_seen so the staleness clock stays intact.
+      if (retained) {
+        deviceRepo.updateFields(device.id, { last_telemetry_json: JSON.stringify(payload) });
+      } else {
+        deviceRepo.touchTelemetry(device.id, payload);
+      }
       const latest = deviceRepo.findById(device.id);
       if (latest) {
-        this.sse.broadcast({ type: 'telemetry', deviceId: device.id, data: payload });
+        this.sse.broadcast({ type: 'telemetry', deviceId: String(device.id), data: payload });
+      }
+      // During a discovery scan, also report already-registered devices so the
+      // user can see which ones are already known (flagged, not re-added).
+      if (this.discoveryActive && !this.discoveryBuffer.has(mac)) {
+        this.discoveryBuffer.set(mac, {
+          mac,
+          name: device.name,
+          ip: device.ip || payload.ip || 'unknown',
+          deviceId: device.deviceId || payload.device_id || null,
+          alreadyAdded: true,
+        });
       }
       return;
     }
@@ -153,17 +181,20 @@ class DeviceService {
     if (!device) return;
     this.sse.broadcast({
       type: 'status',
-      deviceId: device.id,
+      deviceId: String(device.id),
       data: {
-        status: device.status,
+        id: device.id,
+        roomId: device.roomId,
         name: device.name,
-        description: device.description,
-        ip: device.ip,
         mac: device.mac,
         deviceId: device.deviceId,
-        commands: device.commands,
-        commandMode: device.commandMode,
+        deviceType: device.deviceType,
+        ip: device.ip,
+        status: device.status,
         error: device.error,
+        commandMode: device.commandMode,
+        commands: device.commands,
+        createdAt: device.createdAt,
       },
     });
   }
@@ -172,24 +203,27 @@ class DeviceService {
     for (const d of deviceRepo.findAll()) {
       const status = {
         type: 'status',
-        deviceId: d.id,
+        deviceId: String(d.id),
         data: {
-          status: d.status,
+          id: d.id,
+          roomId: d.roomId,
           name: d.name,
-          description: d.description,
-          ip: d.ip,
           mac: d.mac,
           deviceId: d.deviceId,
-          commands: d.commands,
-          commandMode: d.commandMode,
+          deviceType: d.deviceType,
+          ip: d.ip,
+          status: d.status,
           error: d.error,
+          commandMode: d.commandMode,
+          commands: d.commands,
+          createdAt: d.createdAt,
         },
       };
       res.write(`event: device_update\ndata: ${JSON.stringify(status)}\n\n`);
       if (d.lastTelemetry) {
         const tel = {
           type: 'telemetry',
-          deviceId: d.id,
+          deviceId: String(d.id),
           data: d.lastTelemetry,
         };
         res.write(`event: device_update\ndata: ${JSON.stringify(tel)}\n\n`);

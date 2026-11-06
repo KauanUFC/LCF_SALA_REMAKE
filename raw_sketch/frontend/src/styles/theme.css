@@ -175,6 +175,10 @@ a {
   background: var(--success);
 }
 
+.dot.yellow {
+  background: var(--warning);
+}
+
 .dot.red {
   background: var(--danger);
 }
@@ -1004,4 +1008,608 @@ a {
   border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
+}
+
+/* NavLink in sidebar (styled like buttons) */
+.sidebar-nav a {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: var(--radius-xs);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  transition: background 0.12s, color 0.12s;
+  text-decoration: none;
+}
+
+.sidebar-nav a:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.sidebar-nav a.active {
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.sidebar-logo {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Room grid */
+.room-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.room-card {
+  background: var(--bg-secondary);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  transition: border-color 0.12s;
+  cursor: pointer;
+}
+
+.room-card:hover {
+  border-color: var(--accent);
+}
+
+.room-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.125rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.room-icon {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+}
+
+.room-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.room-name {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.room-meta {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.room-card-body {
+  padding: 0.875rem 1.125rem;
+}
+
+.room-stats {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.room-stats .stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.room-stats .value {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.room-stats .label {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.room-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.125rem;
+  border-top: 1px solid var(--border);
+}
+
+.value.green { color: var(--success); }
+.value.red { color: var(--danger); }
+.value.yellow { color: var(--warning); }
+
+/* Device control */
+.device-controls {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.btn-large {
+  padding: 0.75rem 2rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  border-radius: var(--radius);
+}
+
+.brightness-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.brightness-section .form-label {
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+.brightness-slider {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--bg-card);
+  outline: none;
+  -webkit-appearance: none;
+  accent-color: var(--accent);
+}
+
+.brightness-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+}
+
+.brightness-val {
+  min-width: 32px;
+  text-align: right;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.color-section {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: var(--bg-card);
+  border-radius: var(--radius-xs);
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+    padding: 1rem;
+  }
+  .room-grid {
+    grid-template-columns: 1fr;
+  }
+  .device-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Schedule table */
+.schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.schedule-table th,
+.schedule-table td {
+  text-align: left;
+  padding: 0.625rem 0.875rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.schedule-table th {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.schedule-table tr:last-child td {
+  border-bottom: none;
+}
+
+.schedule-table .row-disabled {
+  opacity: 0.5;
+}
+
+.schedule-name {
+  font-weight: 600;
+}
+
+.row-actions {
+  display: flex;
+  gap: 0.375rem;
+  justify-content: flex-end;
+}
+
+/* Day picker */
+.day-picker {
+  display: flex;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.day-chip {
+  padding: 0.375rem 0.625rem;
+  border-radius: var(--radius-xs);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+
+.day-chip.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+@media (max-width: 768px) {
+  .schedule-table th:nth-child(4),
+  .schedule-table td:nth-child(4),
+  .schedule-table th:nth-child(5),
+  .schedule-table td:nth-child(5) {
+    display: none;
+  }
+}
+
+/* Upcoming schedules list */
+.upcoming-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.upcoming-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.625rem;
+  background: var(--bg-card);
+  border-radius: var(--radius-xs);
+}
+
+.upcoming-time {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+}
+
+.upcoming-name {
+  flex: 1;
+  font-weight: 500;
+}
+
+.upcoming-action {
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+}
+
+/* Metric cards (RAW_TESTE telemetry style) */
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin: 1.25rem 0;
+}
+
+.metric-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.metric-card .label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.metric-card .value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-top: 0.25rem;
+}
+
+.metric-card .value.green { color: var(--success); }
+.metric-card .value.red { color: var(--danger); }
+.metric-card .value.yellow { color: var(--warning); }
+.metric-card .value.blue { color: var(--accent); }
+
+/* Status bar (RAW_TESTE style) */
+.status-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+
+.status-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Compact metrics on device list cards */
+.compact-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.compact-metrics .metric {
+  display: flex;
+  flex-direction: column;
+}
+
+.compact-metrics .metric-label {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.compact-metrics .metric-value {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.compact-metrics .metric-value.green { color: var(--success); }
+.compact-metrics .metric-value.yellow { color: var(--warning); }
+.compact-metrics .metric-value.red { color: var(--danger); }
+
+.stat-card.needs-setup { border-color: rgba(234, 179, 8, 0.25); }
+.stat-card.needs-setup .stat-count { color: var(--warning); }
+
+/* Filter bar + search */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.search-input {
+  max-width: 260px;
+  margin-left: auto;
+}
+
+/* Wizard */
+.wizard-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.type-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.625rem;
+}
+
+.type-card {
+  padding: 0.75rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+}
+
+.type-card.selected {
+  border-color: var(--accent);
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.type-label { font-weight: 600; font-size: 0.875rem; }
+.type-desc { font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem; }
+
+/* Rooms list */
+.rooms-list { display: flex; flex-direction: column; gap: 0.625rem; }
+
+.room-row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.75rem 1.125rem;
+  cursor: pointer;
+}
+
+.room-row-main {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1rem;
+  cursor: pointer;
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.room-row-body {
+  padding: 0 1.125rem 1rem;
+  border-top: 1px solid var(--border-light);
+  padding-top: 0.75rem;
+}
+
+.room-device-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+.room-device-list li { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+
+/* Scenes */
+.scene-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+.scene-card .card-footer { display: flex; gap: 0.5rem; padding: 0.75rem 1.125rem; border-top: 1px solid var(--border); }
+
+.scene-rows { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; }
+.scene-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.625rem 0.75rem; background: var(--bg-card); border-radius: var(--radius-xs); flex-wrap: wrap; }
+.scene-row-info { flex: 1; min-width: 120px; font-weight: 500; }
+.scene-row-slider { display: flex; align-items: center; gap: 0.5rem; flex: 1; min-width: 120px; }
+.scene-row-slider input[type='range'] { flex: 1; accent-color: var(--accent); }
+
+/* Settings tabs */
+.settings-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+
+/* Alerts */
+.alerts-list { }
+.alert-item { display: flex; flex-direction: column; gap: 0.125rem; padding: 0.625rem 0.75rem; border-radius: var(--radius-xs); margin-bottom: 0.5rem; }
+.alert-item:last-child { margin-bottom: 0; }
+.alert-error { background: var(--danger-bg); border-left: 3px solid var(--danger); }
+.alert-warning { background: var(--warning-bg); border-left: 3px solid var(--warning); }
+.alert-info { background: rgba(59,130,246,0.12); border-left: 3px solid var(--accent); }
+.alert-title { font-weight: 600; font-size: 0.875rem; color: var(--text-primary); }
+.alert-message { font-size: 0.8125rem; color: var(--text-secondary); }
+
+/* Modal */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center; z-index: 200; padding: 1rem;
+}
+.modal-box {
+  background: var(--bg-secondary); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.25rem; max-width: 480px; width: 100%;
+}
+
+/* Credits */
+.credits-list { list-style: none; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.credits-list li { background: var(--bg-card); padding: 0.375rem 0.75rem; border-radius: var(--radius-xs); font-size: 0.875rem; }
+
+/* Inline mode group inside device card footer */
+.mode-group-inline {
+  gap: 0.4rem;
+  font-size: 0.7rem;
+}
+
+.device-controls {
+  gap: 0.75rem;
+}
+
+/* Connection dot next to device name */
+.connection-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+  vertical-align: baseline;
+}
+
+.dev-name {
+  display: flex;
+  align-items: center;
+}
+
+/* Compact device connection status group in card footer */
+.device-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.device-card-footer .device-status .status-item {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  gap: 0.3rem;
+  white-space: nowrap;
+}
+
+/* Device checklist (checkbox list for schedule device scope) */
+.device-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  padding: 0.625rem 0.75rem;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.device-check-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+.device-check-item input[type='checkbox'] {
+  accent-color: var(--accent);
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+.device-check-item .muted.small {
+  font-size: 0.75rem;
+}
+
+/* Room connection status (WiFi/MQTT in dashboard room card) */
+.room-connection-status {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 0.625rem;
+  padding-top: 0.625rem;
+  border-top: 1px solid var(--border-light);
+}
+
+.room-connection-status .status-item {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  gap: 0.35rem;
+}
+
+.room-connection-status .status-item .dot {
+  width: 7px;
+  height: 7px;
+}
+
+/* Stale telemetry — dim the entire metric grid when device is offline */
+.metric-stale {
+  opacity: 0.5;
+  filter: grayscale(0.3);
 }

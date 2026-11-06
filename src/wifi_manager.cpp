@@ -8,6 +8,10 @@ void WiFiManager::connect(const char* ssid, const char* password) {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 
+  // Modem sleep: radio powers down between frames while keeping the WiFi
+  // connection alive — reduces power draw and heat without affecting the app.
+  WiFi.setSleep(true);
+
   uint32_t start = millis();
   while (WiFi.status() != WL_CONNECTED) {
     esp_task_wdt_reset();

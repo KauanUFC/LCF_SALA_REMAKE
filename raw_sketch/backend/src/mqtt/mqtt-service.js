@@ -27,6 +27,7 @@ class MqttService {
     });
 
     this.client.on('error', (err) => {
+      this.connected = false;
       logger.error(`MQTT error: ${err.message}`);
     });
 
@@ -39,12 +40,17 @@ class MqttService {
       logger.info('MQTT reconnecting...');
     });
 
-    this.client.on('message', (topic, message) => {
-      this.handleMessage(topic, message);
+    this.client.on('close', () => {
+      this.connected = false;
+      logger.info('MQTT connection closed');
+    });
+
+    this.client.on('message', (topic, message, packet) => {
+      this.handleMessage(topic, message, packet?.retain || false);
     });
   }
 
-  handleMessage(topic, message) {
+  handleMessage(topic, message, retained = false) {
     let payload;
     try {
       payload = JSON.parse(message.toString());
@@ -57,7 +63,7 @@ class MqttService {
 
     const suffix = parsed.suffix.join('/');
     if (suffix === 'telemetry') {
-      this.topicHandlers?.telemetry?.(parsed.mac, payload);
+      this.topicHandlers?.telemetry?.(parsed.mac, payload, retained);
     }
   }
 
@@ -65,12 +71,13 @@ class MqttService {
     this.topicHandlers = handlers;
   }
 
-  publishCommand(mac, commandId, action) {
-    if (!this.client || !this.connected) return false;
+  publishCommand(mac, commandId, action, value) {
+    if (!this.client || !this.connected) return null;
     const topic = topics.commandTopic(mac, commandId);
-    const payload = JSON.stringify({ [commandId]: action });
-    this.client.publish(topic, payload);
-    return true;
+    const payload = { [commandId]: action };
+    if (value !== undefined && value !== null) payload.value = value;
+    this.client.publish(topic, JSON.stringify(payload));
+    return topic;
   }
 
   disconnect() {

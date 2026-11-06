@@ -17,7 +17,7 @@ function otaRoutes(deviceService, otaService) {
     }
 
     const deviceId = req.query.deviceId;
-    const device = deviceId ? deviceService.get(deviceId) : null;
+    const device = deviceId ? deviceService.get(Number(deviceId)) : null;
     if (!device) {
       return res.status(400).json({ error: 'No target device specified or device not connected' });
     }

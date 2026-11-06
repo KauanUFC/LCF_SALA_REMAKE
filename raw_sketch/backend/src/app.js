@@ -9,14 +9,24 @@ const { logger } = require('./lib/logger');
 const { MqttService } = require('./mqtt/mqtt-service');
 const { SseService } = require('./services/sse-service');
 const { DeviceService } = require('./services/device-service');
+const { RoomService } = require('./services/room-service');
 const { CommandService } = require('./services/command-service');
 const { OtaService } = require('./services/ota-service');
+const { ScheduleService } = require('./services/schedule-service');
+const { Scheduler } = require('./services/scheduler');
+const { SceneService } = require('./services/scene-service');
+const { AlertsService } = require('./services/alerts-service');
 
 const { infoRoutes } = require('./routes/info');
 const { brokerRoutes } = require('./routes/broker');
 const { deviceRoutes } = require('./routes/devices');
+const { roomRoutes } = require('./routes/rooms');
 const { commandRoutes } = require('./routes/commands');
 const { otaRoutes } = require('./routes/ota');
+const { scheduleRoutes } = require('./routes/schedules');
+const { sceneRoutes } = require('./routes/scenes');
+const { prefsRoutes } = require('./routes/prefs');
+const { alertsRoutes } = require('./routes/alerts');
 const { eventsRoutes } = require('./routes/events');
 
 function createApp() {
@@ -26,21 +36,31 @@ function createApp() {
   // Services
   const mqttService = new MqttService();
   const sseService = new SseService();
-  const deviceService = new DeviceService(sseService);
   const commandService = new CommandService(mqttService);
+  const deviceService = new DeviceService(sseService);
+  const roomService = new RoomService(sseService, commandService);
   const otaService = new OtaService();
+  const scheduleService = new ScheduleService(commandService);
+  const scheduler = new Scheduler(scheduleService);
+  const sceneService = new SceneService(commandService);
+  const alertsService = new AlertsService();
 
   // Wire MQTT input to device service.
   mqttService.on({
-    telemetry: (mac, payload) => deviceService.handleTelemetry(mac, payload),
+    telemetry: (mac, payload, retained) => deviceService.handleTelemetry(mac, payload, retained),
   });
 
   // Routes
   app.use(infoRoutes());
   app.use(brokerRoutes(() => mqttService.connected));
-  app.use(deviceRoutes(deviceService));
+  app.use(roomRoutes(roomService));
+  app.use(deviceRoutes(deviceService, commandService));
   app.use(commandRoutes(deviceService, commandService));
   app.use(otaRoutes(deviceService, otaService));
+  app.use(scheduleRoutes(scheduleService));
+  app.use(sceneRoutes(sceneService));
+  app.use(prefsRoutes());
+  app.use(alertsRoutes(alertsService));
   app.use(eventsRoutes(sseService, deviceService));
 
   // Serve compiled frontend when available (production mode).
@@ -70,7 +90,7 @@ function createApp() {
     }
   });
 
-  return { app, services: { mqttService, sseService, deviceService } };
+  return { app, services: { mqttService, sseService, deviceService, roomService, scheduleService, scheduler } };
 }
 
 module.exports = { createApp };

@@ -14,6 +14,9 @@ async function main() {
   // Re-probe known devices kept in 'connecting' state from the previous run.
   services.deviceService.probe();
 
+  // Start the schedule executor.
+  services.scheduler.start();
+
   const server = app.listen(env.PORT, '0.0.0.0', () => {
     logger.info(`LCFLIGHT backend listening on http://0.0.0.0:${env.PORT}`);
   });
@@ -21,6 +24,7 @@ async function main() {
   const shutdown = () => {
     logger.info('Shutting down...');
     server.close(() => {
+      services.scheduler.stop();
       services.mqttService.disconnect();
       services.sseService.close();
       closeDatabase();

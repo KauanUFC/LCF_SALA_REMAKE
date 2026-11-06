@@ -50,6 +50,13 @@ void handle_led_off() {
   http_server.send(200, "application/json", "{\"led\":\"off\"}");
 }
 
+void handle_restart() {
+  add_cors_headers();
+  http_server.send(200, "application/json", "{\"restart\":\"ok\"}");
+  delay(500);
+  ESP.restart();
+}
+
 void handle_led_status() {
   add_cors_headers();
   String json = String("{\"led\":\"") + (led_state ? "on" : "off") + "\"}";
@@ -104,6 +111,11 @@ void on_mqtt_message(const String& topic, const String& payload) {
         write_led(false);
       }
     }
+  } else if (topic.endsWith("/cmd/restart")) {
+    Serial.println("Restart command received via MQTT");
+    Serial.flush();
+    delay(200);
+    ESP.restart();
   }
 }
 
@@ -119,6 +131,11 @@ void on_mqtt_connect() {
 void setup() {
   Serial.begin(115200);
   delay(500);
+
+  // Lower CPU frequency (80 MHz) to reduce heat/power while keeping full
+  // responsiveness. Override at build time with -DCPU_FREQ_MHZ=160.
+  setCpuFrequencyMhz(CpuFreqMhz);
+  Serial.printf("CPU frequency: %u MHz\n", getCpuFrequencyMhz());
 
   Serial.printf("Reset reason: %d\n", esp_reset_reason());
 
@@ -139,9 +156,13 @@ void setup() {
   http_server.on("/led/on", HTTP_GET, handle_led_on);
   http_server.on("/led/off", HTTP_GET, handle_led_off);
   http_server.on("/led/status", HTTP_GET, handle_led_status);
+  http_server.on("/restart/on", HTTP_GET, handle_restart);
+  http_server.on("/restart/off", HTTP_GET, handle_restart);
   http_server.on("/led/on", HTTP_OPTIONS, handle_led_options);
   http_server.on("/led/off", HTTP_OPTIONS, handle_led_options);
   http_server.on("/led/status", HTTP_OPTIONS, handle_led_options);
+  http_server.on("/restart/on", HTTP_OPTIONS, handle_led_options);
+  http_server.on("/restart/off", HTTP_OPTIONS, handle_led_options);
   http_server.on("/api/device", HTTP_GET, handle_api_device);
   http_server.on("/api/device", HTTP_OPTIONS, handle_led_options);
   http_server.on("/api/capabilities", HTTP_GET, handle_api_capabilities);

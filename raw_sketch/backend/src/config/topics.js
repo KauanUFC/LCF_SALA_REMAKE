@@ -1,10 +1,9 @@
 'use strict';
 
 // Single source of truth for MQTT topic construction.
-// The firmware uses the following layout (firmware side is out of scope):
+// The firmware publishes and subscribes to the following layout:
 //   {prefix}/{mac}/telemetry      -> device telemetry JSON
-//   {prefix}/{mac}/status         -> retained status published on connect
-//   {prefix}/{mac}/cmd/{command}  -> command input from backend
+//   {prefix}/{mac}/cmd/{command}  -> command input from backend (published by us)
 
 const { env } = require('./env');
 
